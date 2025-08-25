@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bridge TOS Callback</title>
+</head>
+<body>
+    <script>
+        // Get all URL parameters and redirect immediately
+        const params = new URLSearchParams(window.location.search);
+        const signedId = params.get('signed_agreement_id');
+        
+        if (signedId) {
+            // Show success and close window
+            document.body.innerHTML = '<h2>✅ Terms Accepted!</h2><p>Redirecting...</p>';
+            
+            // Try to communicate with parent window/app
+            if (window.opener) {
+                window.opener.postMessage({type: 'tos_accepted', id: signedId}, '*');
+                window.close();
+            } else if (window.parent !== window) {
+                window.parent.postMessage({type: 'tos_accepted', id: signedId}, '*');
+            }
+            
+            // Auto-close after 2 seconds
+            setTimeout(() => window.close(), 2000);
+        } else {
+            document.body.innerHTML = '<h2>❌ No agreement ID found</h2>';
+        }
+    </script>
+</body>
+</html>
